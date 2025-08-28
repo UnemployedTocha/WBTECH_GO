@@ -15,9 +15,12 @@ services:
     restart: always
     image: postgres:latest
     volumes:
-      - ./.database/postgres/data:/var/lib/postgresql/data:Z
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     env_file:
       - .env
     ports:
       - 5436:5432
 
+volumes:
+  postgres_data:
