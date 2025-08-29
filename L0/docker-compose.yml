@@ -5,7 +5,7 @@ services:
     build: ./
     command: ./demo_service
     ports:
-      - 8098:8089
+      - "${SERVICE_PORT}:${SERVICE_INTERNAL_PORT}"
     depends_on:
       - db
     env_file:
@@ -20,7 +20,7 @@ services:
     env_file:
       - .env
     ports:
-      - 5436:5432
+      - "${POSTGRES_PORT}:${POSTGRES_INTERNAL_PORT}"
 
 volumes:
   postgres_data:
