@@ -20,20 +20,13 @@ func main() {
 	fmt.Println("AAaaaaaaaaaaaa")
 
 	// TODO: init storage
-	_, err := repository.NewDb(repository.Config{
-		Host:     os.Getenv("POSTGRES_HOST"),
-		Port:     os.Getenv("POSTGRES_PORT"),
-		Username: os.Getenv("POSTGRES_USER"),
-		Password: os.Getenv("POSTGRES_PASSWORD"),
-		DBName:   os.Getenv("POSTGRES_DB"),
-		SSLMode:  os.Getenv("SSL_MODE"),
-	})
+	repo, err := repository.NewRepository()
 
 	if err != nil {
-		log.Error("Failed to init db: ", err.Error())
+		log.Error("Failed to connect to database")
+		os.Exit(1)
 	}
-
-	//rep := repository.NewRepository(db)
+	_ = repo
 
 	// TODO: init router
 	// chi?
