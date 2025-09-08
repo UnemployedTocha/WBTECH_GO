@@ -23,7 +23,7 @@
 1. Склонируйте репозиторий:
 
 ```bash
-git clone https://github.com/UnemployedTocha/WBTECH_GO.git && cd WBTECH_GO
+git clone https://github.com/UnemployedTocha/WBTECH_GO.git && cd WBTECH_GO/L0/
 ```
 
 2. Заполните .env конфиг файл. Пример который можно использовать:
