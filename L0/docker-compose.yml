@@ -1,4 +1,4 @@
-version: '3.8'
+#version: '3.8'
 
 services:
   demo_service:
@@ -10,7 +10,13 @@ services:
       - db
     env_file:
       - .env
-
+  producer:
+    build: ./
+    command: ./producer
+    depends_on:
+      - kafka
+    env_file:
+      - .env
   db:
     restart: always
     image: postgres:latest
@@ -21,6 +27,47 @@ services:
       - .env
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_INTERNAL_PORT}"
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.7.1
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_SERVER_ID: 1
+
+  kafka:
+    image: confluentinc/cp-kafka:7.7.1
+    hostname: kafka
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "8901:8901"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29091,PLAINTEXT_HOST://localhost:8901
+      KAFKA_LISTENERS: PLAINTEXT://:29091,PLAINTEXT_HOST://:8901
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    depends_on:
+      - kafka
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:29091"
+      KAFKA_CLUSTERS_0_ZOOKEEPER: "zookeeper:2181"
+
+
+
 
 volumes:
   postgres_data:
