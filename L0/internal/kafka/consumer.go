@@ -69,7 +69,6 @@ func (c *Consumer) Start() {
 			c.log.Error("reading kafka message error", slog.Any("err", err))
 		}
 
-		// ВАЖНО: проверяем что msg не nil
 		if msg == nil {
 			c.log.Error("Received nil message, continue consumer work")
 			continue
