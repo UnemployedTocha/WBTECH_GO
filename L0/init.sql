@@ -15,7 +15,7 @@ create table orders
 
 create table delivery
 (
-    integer   serial primary key,
+    id   serial primary key,
     order_uid varchar references orders (order_uid) on delete cascade,
     name      varchar,
     phone     varchar,
