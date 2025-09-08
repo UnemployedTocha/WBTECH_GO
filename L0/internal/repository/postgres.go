@@ -1,9 +1,19 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
+	"log/slog"
+	"time"
 
 	"github.com/jmoiron/sqlx"
+)
+
+var (
+	OrderNotFound    = errors.New("order not found")
+	DeliveryNotFound = errors.New("delivery not found")
+	ItemsNotFound    = errors.New("items not found")
+	PaymentNotFound  = errors.New("payment not found")
 )
 
 type Config struct {
@@ -15,15 +25,17 @@ type Config struct {
 	SSLMode  string
 }
 
-func NewDb(config Config) (*sqlx.DB, error) {
-	const op = "repository.posgres.New"
+func NewDb(config Config, log *slog.Logger) *sqlx.DB {
 
-	db, err := sqlx.Connect("postgres", fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
-		config.Host, config.Port, config.Username, config.DBName, config.Password, config.SSLMode))
+	for {
+		db, err := sqlx.Connect("postgres", fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
+			config.Host, config.Port, config.Username, config.DBName, config.Password, config.SSLMode))
 
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		if err != nil {
+			log.Error("connection to db failed | retrying in 3 sec")
+			time.Sleep(3 * time.Second)
+			continue
+		}
+		return db
 	}
-
-	return db, err
 }
