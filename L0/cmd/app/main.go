@@ -1,12 +1,16 @@
 package main
 
 import (
+	"demo_service/internal/http-server/handlers"
+	k "demo_service/internal/kafka"
 	"demo_service/internal/repository"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	_ "github.com/joho/godotenv/autoload"
 	_ "github.com/lib/pq"
 )
@@ -17,10 +21,8 @@ func main() {
 	log := setupLogger()
 	log.Info("Starting service")
 
-	fmt.Println("AAaaaaaaaaaaaa")
-
 	// TODO: init storage
-	repo, err := repository.NewRepository()
+	repo, err := repository.NewRepository(log)
 
 	if err != nil {
 		log.Error("Failed to connect to database")
@@ -28,15 +30,44 @@ func main() {
 	}
 	_ = repo
 
-	// TODO: init router
-	// chi?
+	h := k.NewHandler(repo, log)
+	consumer, err := k.NewConsumer("kafka:29091", h, "some_topic", "123", log)
 
-	// init start server
-	http.HandleFunc("/docker", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "<h1>Hello from docker container!!1!1!</h1>")
+	if err != nil {
+		log.Error("AAAAAAA", err)
+	}
+
+	go consumer.Start()
+	//ch := make(chan os.Signal, 1)
+	//signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+	//
+	//<-ch
+
+	// TODO: init router
+	router := chi.NewRouter()
+
+	router.Use(middleware.RequestID)
+	router.Use(middleware.Logger)
+	router.Use(middleware.Recoverer)
+	router.Use(middleware.URLFormat)
+
+	router.Route("/orders", func(r chi.Router) {
+		r.Get("/{order_uid}", handlers.New(repo, log)) // GET /orders/{order_uid} - конкретный заказ
 	})
 
-	http.ListenAndServe(":"+os.Getenv("SERVICE_INTERNAL_PORT"), nil)
+	log.Info("!!!!!!!!!!!!!!!!!!!!!!!!!!! :" + os.Getenv("SERVICE_INTERNAL_PORT"))
+
+	server := &http.Server{
+		Addr:         ":" + os.Getenv("SERVICE_INTERNAL_PORT"),
+		Handler:      router,
+		ReadTimeout:  4 * time.Second,
+		WriteTimeout: 4 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
+
+	if err = server.ListenAndServe(); err != nil {
+		log.Error("server start failed :(")
+	}
 }
 
 func setupLogger() (log *slog.Logger) {
