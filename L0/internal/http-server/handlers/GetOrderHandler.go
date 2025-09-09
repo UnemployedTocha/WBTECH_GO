@@ -49,6 +49,7 @@ func New(getOrderHandler GetOrderHandler, log *slog.Logger) http.HandlerFunc {
 
 		order, err := getOrderHandler.GetOrderById(orderUid)
 
+		// TODO: переписать в свич кейс
 		if errors.Is(err, repository.OrderNotFound) {
 			log.Error("order not found: ", slog.Any("uid: ", orderUid))
 			render.JSON(w, r, "failed to get order")
@@ -64,13 +65,13 @@ func New(getOrderHandler GetOrderHandler, log *slog.Logger) http.HandlerFunc {
 			render.JSON(w, r, "failed to get payment")
 			return
 		}
-		//if errors.Is(err, repository.ItemsNotFound) {
-		//	log.Error("items not found")
-		//	render.JSON(w, r, "failed to get items")
-		//	return
-		//}
+		if errors.Is(err, repository.ItemsNotFound) {
+			log.Error("items not found")
+			render.JSON(w, r, "failed to get items")
+			return
+		}
 
-		log.Info("order got", slog.Any("order: ", orderUid))
+		log.Info("order received", slog.Any("order: ", orderUid))
 
 		render.JSON(w, r, Response{
 			Status: "Ok",
