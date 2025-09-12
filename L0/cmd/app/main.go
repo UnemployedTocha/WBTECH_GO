@@ -4,6 +4,8 @@ import (
 	"demo_service/internal/http-server/handlers"
 	k "demo_service/internal/kafka"
 	"demo_service/internal/repository"
+	"embed"
+	"io/fs"
 	"log/slog"
 	"net/http"
 	"os"
@@ -14,6 +16,9 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	_ "github.com/lib/pq"
 )
+
+//go:embed static/*
+var page embed.FS
 
 func main() {
 
@@ -38,10 +43,6 @@ func main() {
 	}
 
 	go consumer.Start()
-	//ch := make(chan os.Signal, 1)
-	//signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
-	//
-	//<-ch
 
 	// TODO: init router
 	router := chi.NewRouter()
@@ -51,11 +52,12 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
 
+	content, _ := fs.Sub(page, "static")
+	router.Handle("/*", http.FileServer(http.FS(content)))
+
 	router.Route("/orders", func(r chi.Router) {
 		r.Get("/{order_uid}", handlers.New(repo, log)) // GET /orders/{order_uid} - конкретный заказ
 	})
-
-	log.Info("!!!!!!!!!!!!!!!!!!!!!!!!!!! :" + os.Getenv("SERVICE_INTERNAL_PORT"))
 
 	server := &http.Server{
 		Addr:         ":" + os.Getenv("SERVICE_INTERNAL_PORT"),

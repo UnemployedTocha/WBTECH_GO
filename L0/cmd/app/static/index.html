@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Поиск заказа</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f9fafb;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    input {
+      padding: 8px;
+      width: 70%;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      padding: 8px 16px;
+      margin-left: 10px;
+      border: none;
+      border-radius: 6px;
+      background: rgb(150, 44, 192);
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: rgb(114, 35, 145);
+    }
+    .result {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      background: #f4f4f4;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #222;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Поиск заказа по ID</h2>
+    <input id="orderId" placeholder="Введите order_uid">
+    <button onclick="getOrder()">Найти</button>
+
+    <div class="result" id="result">Здесь появятся данные заказа</div>
+  </div>
+
+  <script>
+    async function getOrder() {
+      const orderId = document.getElementById("orderId").value.trim();
+      const resultEl = document.getElementById("result");
+
+      if (!orderId) {
+        resultEl.textContent = "Введите order_uid";
+        return;
+      }
+
+      let url = `http://localhost:8098/orders/${orderId}`;
+      //let url = "./mock/orders.json";
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          resultEl.textContent = "Заказ не найден";
+          return;
+        }
+        const data = await response.json();
+
+        resultEl.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        resultEl.textContent = "Ошибка: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
