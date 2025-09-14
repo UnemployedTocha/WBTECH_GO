@@ -83,8 +83,7 @@ func (r *Repository) SaveOrder(order models.Order) (err error) {
 }
 
 func (r *Repository) GetOrderById(order_uid string) (models.Order, error) {
-	//var order models.Order
-	//err := r.db.Select(&order, "SELECT ")
+	// TODO: тоже сделать в транзакции??
 	var order models.Order
 	query := `SELECT * FROM orders WHERE order_uid = $1`
 	err := r.db.Get(&order, query, order_uid)
@@ -113,7 +112,7 @@ func (r *Repository) GetOrderById(order_uid string) (models.Order, error) {
 
 	var items []models.Item
 	query = `SELECT * FROM items WHERE order_uid = $1`
-	err = r.db.Get(&items, query, order_uid)
+	err = r.db.Select(&items, query, order_uid)
 
 	if err != nil {
 		return order, ItemsNotFound
