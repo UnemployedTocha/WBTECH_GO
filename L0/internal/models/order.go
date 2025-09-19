@@ -2,10 +2,12 @@ package models
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Order struct {
-	OrderUId          string    `json:"order_uid" db:"order_uid"`
+	OrderUId          uuid.UUID `json:"order_uid" db:"order_uid"`
 	OrderDelivery     Delivery  `json:"delivery" db:"-"`
 	OrderPayment      Payment   `json:"payment" db:"-"`
 	OrderItems        []Item    `json:"items" db:"-"`
@@ -16,7 +18,7 @@ type Order struct {
 	CustomerId        string    `json:"customer_id" db:"customer_id"`
 	DeliveryService   string    `json:"delivery_service" db:"delivery_service"`
 	ShardKey          string    `json:"shardkey" db:"shardkey"`
-	SmId              int       `json:"sm_id" db:"sm_id"`
+	SmId              int64       `json:"sm_id" db:"sm_id"`
 	DateCreated       time.Time `json:"date_created" db:"date_created"`
 	OofShard          string    `json:"oof_shard" db:"oof_shard"`
 }

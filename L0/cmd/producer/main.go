@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
-	"time"
 )
 
 const (
@@ -28,7 +27,7 @@ func main() {
 
 	orders := readOrders()
 
-	time.Sleep(3)
+	// time.Sleep(3)
 
 	for _, order := range orders {
 		err = producer.Produce(order, topic)
