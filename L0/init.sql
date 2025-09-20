@@ -1,6 +1,6 @@
 create table orders
 (
-    order_uid uuid default gen_random_uuid() primary key,
+    order_uid          text primary key,
     track_number       text unique not null,
     entry              text not null,
     locale             varchar(8) not null,
@@ -15,7 +15,7 @@ create table orders
 
 create table delivery
 (
-    order_uid uuid primary key references orders (order_uid) on delete cascade,
+    order_uid text primary key references orders (order_uid) on delete cascade,
     name      text not null,
     phone     varchar(20) not null,
     zip       text not null,
@@ -27,7 +27,7 @@ create table delivery
 
 create table payment
 (
-    transaction   uuid primary key references orders (order_uid) on delete cascade,
+    transaction   text primary key references orders (order_uid) on delete cascade,
     request_id    text,
     currency      varchar(8) not null,
     provider      text not null,
@@ -41,8 +41,8 @@ create table payment
 
 create table items
 (
-    rid          uuid default gen_random_uuid() primary key,
-    order_uid    uuid references orders (order_uid) on delete cascade,
+    rid          text default gen_random_uuid() primary key,
+    order_uid    text references orders (order_uid) on delete cascade,
     chrt_id      bigint not null,
     track_number text not null,
     price        double precision not null,

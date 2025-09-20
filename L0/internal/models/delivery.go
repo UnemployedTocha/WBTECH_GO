@@ -1,11 +1,7 @@
 package models
 
-import (
-	"github.com/google/uuid"
-)
-
 type Delivery struct {
-	OrderUId uuid.UUID `json:"order_uid" db:"order_uid"`
+	OrderUId string `json:"order_uid" db:"order_uid"`
 	Name     string `json:"name" db:"name"`
 	Phone    string `json:"phone" db:"phone"`
 	Zip      string `json:"zip" db:"zip"`

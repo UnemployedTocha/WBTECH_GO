@@ -59,7 +59,7 @@ func (r *Repository) SaveOrder(order models.Order) error {
 
 	query = `INSERT INTO payment (transaction, request_id, currency, provider, amount,
                 payment_dt, bank, delivery_cost, goods_total, custom_fee)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`
 
 	_, err = tx.Exec(query, order.OrderUId, order.OrderPayment.RequestId,
 		order.OrderPayment.Currency, order.OrderPayment.Provider, order.OrderPayment.Amount,
