@@ -44,6 +44,10 @@ SSL_MODE=disable
 
 SERVICE_PORT=8098
 SERVICE_INTERNAL_PORT=8089
+
+KAFKA_INTERNAL_PORT=29091
+KAFKA_PORT=8901
+KAFKA_TOPIC_NAME=some_topic
 ```
 
 3. Соберите и запустите контейнеры:
