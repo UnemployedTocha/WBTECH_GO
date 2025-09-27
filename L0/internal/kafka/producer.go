@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 )
@@ -25,22 +24,9 @@ func NewProducer(address string, logger *slog.Logger) (*Producer, error) {
 
 	logger.Info("making consumer")
 
-	for {
-		p, err := kafka.NewProducer(&cfg)
-		if err != nil {
-			logger.Error("kafka producer creation failed, waiting 3 sec, ", slog.Any("err: ", err))
-			time.Sleep(3 * time.Second)
-			continue
-		}
+	p, _ := kafka.NewProducer(&cfg)
 
-		_, err = p.GetMetadata(nil, true, 3000)
-		if err != nil {
-			p.Close()
-			logger.Error("kafka producer pinging failed, waiting 3 sec, ", slog.Any("err: ", err))
-			continue
-		}
-		return &Producer{producer: p, log: logger}, nil
-	}
+	return &Producer{producer: p, log: logger}, nil
 }
 
 func (p *Producer) Produce(order models.Order, topic string) error {
